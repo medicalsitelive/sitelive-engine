@@ -5,75 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ViewBooster Gold | LTX Engine</title>
     <style>
-        body { font-family: 'Inter', -apple-system, sans-serif; background: #050505; color: #f0f0f0; text-align: center; padding: 20px; margin: 0; }
-        .container { max-width: 450px; margin: 40px auto; background: #111; padding: 30px; border-radius: 24px; border: 1px solid #222; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-        h2 { color: #FFD700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; font-size: 22px; }
-        .brand { font-size: 10px; color: #888; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
-        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus { border-color: #FFD700; }
-        button { background: linear-gradient(135deg, #FFD700, #b8860b); color: black; border: none; padding: 16px; border-radius: 12px; cursor: pointer; font-weight: 800; width: 100%; text-transform: uppercase; transition: 0.3s; }
-        button:hover { transform: scale(1.02); brightness: 1.1; }
-        button:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #050505; color: #f0f0f0; text-align: center; padding: 20px; margin: 0; }
+        .container { max-width: 450px; margin: 30px auto; background: #111; padding: 30px; border-radius: 28px; border: 1px solid #222; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+        h2 { color: #FFD700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; font-weight: 900; }
+        .brand { font-size: 10px; color: #666; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 25px; }
+        input { width: 100%; padding: 16px; margin: 15px 0; border-radius: 14px; border: 1px solid #333; background: #181818; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+        button { background: linear-gradient(145deg, #FFD700, #d4af37); color: black; border: none; padding: 18px; border-radius: 14px; cursor: pointer; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 14px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        button:active { transform: scale(0.97); }
+        button:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; }
         #progress-container { margin-top: 30px; display: none; text-align: left; }
-        .progress-bar { width: 100%; background: #222; height: 6px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
-        .progress-fill { width: 0%; background: #FFD700; height: 100%; transition: width 0.1s linear; }
-        .stats { display: flex; justify-content: space-between; font-size: 12px; color: #FFD700; font-family: monospace; }
-        #speed-text { font-size: 11px; color: #555; margin-top: 8px; text-align: center; font-style: italic; }
-        video { width: 100%; margin-top: 25px; border-radius: 16px; display: none; border: 1px solid #333; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        #status { font-size: 13px; margin-bottom: 15px; font-weight: 500; }
+        .progress-bar { width: 100%; background: #222; height: 8px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .progress-fill { width: 0%; background: #FFD700; height: 100%; transition: width 0.15s ease-out; }
+        .stats { display: flex; justify-content: space-between; font-size: 12px; color: #FFD700; font-family: 'Courier New', monospace; }
+        video { width: 100%; margin-top: 25px; border-radius: 20px; display: none; border: 2px solid #222; }
+        #status-box { background: #181818; padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 20px; border: 1px solid #222; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>ViewBooster Gold</h2>
-        <div class="brand">Boostara Innovations</div>
-        <p id="status">Scanning Hardware...</p>
+        <h2>VIEWBOOSTER GOLD</h2>
+        <div class="brand">BOOSTARA INNOVATIONS</div>
+        
+        <div id="status-box">
+            Status: <span id="status-text" style="color: #888;">Initializing...</span>
+        </div>
         
         <input type="text" id="prompt" placeholder="Describe your viral video idea...">
-        <button id="gen-btn" disabled>Initialize LTX 2.3</button>
+        <button id="gen-btn" disabled>Waiting for Hardware...</button>
 
         <div id="progress-container">
             <div class="stats">
-                <span id="progress-text">Compressing: 0.00%</span>
-                <span id="time-left">Calculating...</span>
+                <span id="p-percent">COMPRESSING: 0.00%</span>
+                <span id="p-time">--:--</span>
             </div>
-            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
-            <div id="speed-text">Optimizing neural weights for mobile GPU...</div>
+            <div class="progress-bar"><div id="p-fill" class="progress-fill"></div></div>
+            <div style="font-size: 10px; color: #555; text-align: center;">Running LTX-Video 2.3 Edge Engine</div>
         </div>
 
         <video id="output-video" controls autoplay loop></video>
     </div>
 
     <script type="module">
-        import { LTXVideoForGenerator, AutoTokenizer } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
+        // Using the most stable v3 production link
+        import { LTXVideoForGenerator, AutoTokenizer } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
 
         const btn = document.getElementById('gen-btn');
-        const status = document.getElementById('status');
-        const fill = document.getElementById('progress-fill');
-        const progText = document.getElementById('progress-text');
-        const timeText = document.getElementById('time-left');
+        const statusText = document.getElementById('status-text');
+        const fill = document.getElementById('p-fill');
+        const pPercent = document.getElementById('p-percent');
+        const pTime = document.getElementById('p-time');
         const progCont = document.getElementById('progress-container');
         const video = document.getElementById('output-video');
 
-        let startTime;
-
-        if (navigator.gpu) {
-            status.innerHTML = "<span style='color: #FFD700;'>●</span> Hardware Accelerated: READY";
-            btn.disabled = false;
-        } else {
-            status.innerHTML = "<span style='color: #ff4444;'>●</span> Hardware Incompatible";
+        // Check WebGPU immediately
+        async function checkHardware() {
+            if (navigator.gpu) {
+                statusText.innerHTML = "✅ WebGPU Ready";
+                statusText.style.color = "#FFD700";
+                btn.disabled = false;
+                btn.innerText = "INITIALIZE LTX 2.3";
+            } else {
+                statusText.innerHTML = "❌ Hardware Not Supported";
+                statusText.style.color = "#ff4444";
+                btn.innerText = "INCOMPATIBLE DEVICE";
+            }
         }
+        checkHardware();
 
         btn.onclick = async () => {
-            const userPrompt = document.getElementById('prompt').value || "Cinematic viral drone shot";
+            const userPrompt = document.getElementById('prompt').value || "A golden galaxy spinning";
             btn.disabled = true;
             progCont.style.display = 'block';
-            startTime = Date.now();
+            const startTime = Date.now();
 
             try {
                 const model_id = 'onnx-community/LTX-Video-0.1-q4';
                 
-                // Load LTX-Video 2.3 Class
+                // Using the dedicated LTX class to avoid "Unsupported Pipeline" error
                 const model = await LTXVideoForGenerator.from_pretrained(model_id, {
                     device: 'webgpu',
                     dtype: 'q4',
@@ -81,26 +90,21 @@
                         if (data.status === 'progress') {
                             const p = data.progress;
                             fill.style.width = p.toFixed(2) + '%';
-                            progText.innerText = `Compressing: ${p.toFixed(2)}%`;
+                            pPercent.innerText = `COMPRESSING: ${p.toFixed(2)}%`;
                             
-                            // High-Speed Time Estimation
+                            // High-speed estimation
                             const elapsed = (Date.now() - startTime) / 1000;
                             const remaining = (elapsed / p * 100) - elapsed;
-                            const mins = Math.floor(remaining / 60);
-                            const secs = Math.floor(remaining % 60);
-                            
-                            if (p > 1) {
-                                timeText.innerText = mins > 0 ? `${mins}m ${secs}s left` : `${secs}s left`;
-                            }
+                            const s = Math.floor(remaining % 60);
+                            const m = Math.floor(remaining / 60);
+                            if (p > 0.5) pTime.innerText = m > 0 ? `${m}m ${s}s left` : `${s}s left`;
                         }
                     }
                 });
 
                 const tokenizer = await AutoTokenizer.from_pretrained(model_id);
+                pPercent.innerText = "RENDERING PIXELS...";
                 
-                progText.innerText = "LTX: Rendering Pixels...";
-                timeText.innerText = "Processing...";
-
                 const { video: videoBlob } = await model.generate(userPrompt, tokenizer, {
                     num_frames: 16,
                     width: 512,
@@ -111,11 +115,13 @@
                 video.style.display = 'block';
                 progCont.style.display = 'none';
                 btn.disabled = false;
-                status.innerText = "✅ Video Mastered Successfully";
+                btn.innerText = "REGENERATE GOLD";
+                statusText.innerText = "✅ MASTERED SUCCESSFULLY";
 
             } catch (err) {
                 console.error(err);
-                status.innerHTML = `<span style='color:#ff4444;'>Engine Error: ${err.message.split('at')[0]}</span>`;
+                statusText.innerText = "ENGINE ERROR: REFRESH AND TRY AGAIN";
+                statusText.style.color = "red";
                 btn.disabled = false;
             }
         };
