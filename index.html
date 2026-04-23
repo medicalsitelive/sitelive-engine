@@ -1,78 +1,124 @@
-<script type="module">
-    // We import the specific LTX classes instead of the generic 'pipeline'
-    import { 
-        LTXVideoForGenerator, 
-        AutoTokenizer, 
-        AutoConfig 
-    } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViewBooster Gold | LTX Engine</title>
+    <style>
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #050505; color: #f0f0f0; text-align: center; padding: 20px; margin: 0; }
+        .container { max-width: 450px; margin: 40px auto; background: #111; padding: 30px; border-radius: 24px; border: 1px solid #222; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+        h2 { color: #FFD700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; font-size: 22px; }
+        .brand { font-size: 10px; color: #888; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #FFD700; }
+        button { background: linear-gradient(135deg, #FFD700, #b8860b); color: black; border: none; padding: 16px; border-radius: 12px; cursor: pointer; font-weight: 800; width: 100%; text-transform: uppercase; transition: 0.3s; }
+        button:hover { transform: scale(1.02); brightness: 1.1; }
+        button:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+        #progress-container { margin-top: 30px; display: none; text-align: left; }
+        .progress-bar { width: 100%; background: #222; height: 6px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .progress-fill { width: 0%; background: #FFD700; height: 100%; transition: width 0.1s linear; }
+        .stats { display: flex; justify-content: space-between; font-size: 12px; color: #FFD700; font-family: monospace; }
+        #speed-text { font-size: 11px; color: #555; margin-top: 8px; text-align: center; font-style: italic; }
+        video { width: 100%; margin-top: 25px; border-radius: 16px; display: none; border: 1px solid #333; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        #status { font-size: 13px; margin-bottom: 15px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ViewBooster Gold</h2>
+        <div class="brand">Boostara Innovations</div>
+        <p id="status">Scanning Hardware...</p>
+        
+        <input type="text" id="prompt" placeholder="Describe your viral video idea...">
+        <button id="gen-btn" disabled>Initialize LTX 2.3</button>
 
-    const btn = document.getElementById('gen-btn');
-    const status = document.getElementById('status');
-    const fill = document.getElementById('progress-fill');
-    const progText = document.getElementById('progress-text');
-    const timeText = document.getElementById('time-left');
-    const progCont = document.getElementById('progress-container');
-    const video = document.getElementById('output-video');
+        <div id="progress-container">
+            <div class="stats">
+                <span id="progress-text">Compressing: 0.00%</span>
+                <span id="time-left">Calculating...</span>
+            </div>
+            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+            <div id="speed-text">Optimizing neural weights for mobile GPU...</div>
+        </div>
 
-    let startTime;
+        <video id="output-video" controls autoplay loop></video>
+    </div>
 
-    if (navigator.gpu) {
-        status.innerHTML = "<span style='color: #28a745;'>●</span> LTX System Ready";
-        btn.disabled = false;
-    }
+    <script type="module">
+        import { LTXVideoForGenerator, AutoTokenizer } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
 
-    btn.onclick = async () => {
-        const userPrompt = document.getElementById('prompt').value || "A cinematic shot of Nairobi";
-        btn.disabled = true;
-        progCont.style.display = 'block';
-        startTime = Date.now();
+        const btn = document.getElementById('gen-btn');
+        const status = document.getElementById('status');
+        const fill = document.getElementById('progress-fill');
+        const progText = document.getElementById('progress-text');
+        const timeText = document.getElementById('time-left');
+        const progCont = document.getElementById('progress-container');
+        const video = document.getElementById('output-video');
 
-        try {
-            const model_id = 'onnx-community/LTX-Video-0.1-q4';
-            
-            // 1. Load the Model directly (fixes the "Unsupported Pipeline" error)
-            const model = await LTXVideoForGenerator.from_pretrained(model_id, {
-                device: 'webgpu',
-                dtype: 'q4',
-                progress_callback: (data) => {
-                    if (data.status === 'progress') {
-                        const p = data.progress;
-                        fill.style.width = p.toFixed(2) + '%';
-                        progText.innerText = `Compressing: ${p.toFixed(2)}%`;
-                        
-                        // Time estimation logic
-                        const elapsed = (Date.now() - startTime) / 1000;
-                        const remaining = (elapsed / p * 100) - elapsed;
-                        const mins = Math.floor(remaining / 60);
-                        const secs = Math.floor(remaining % 60);
-                        timeText.innerText = p > 1 ? `${mins}m ${secs}s left` : "Calculating...";
-                    }
-                }
-            });
+        let startTime;
 
-            const tokenizer = await AutoTokenizer.from_pretrained(model_id);
-            
-            progText.innerText = "LTX is dreaming...";
-            timeText.innerText = "Generating pixels...";
-
-            // 2. Generate the video
-            const { video: videoBlob } = await model.generate(userPrompt, tokenizer, {
-                num_frames: 16,
-                width: 512,
-                height: 320,
-            });
-
-            video.src = URL.createObjectURL(videoBlob);
-            video.style.display = 'block';
-            progCont.style.display = 'none';
+        if (navigator.gpu) {
+            status.innerHTML = "<span style='color: #FFD700;'>●</span> Hardware Accelerated: READY";
             btn.disabled = false;
-            status.innerText = "✅ Video Ready!";
-
-        } catch (err) {
-            console.error(err);
-            // This catches specific WebGPU memory errors
-            status.innerHTML = `<span style='color:red;'>Error: ${err.message.split('at')[0]}</span>`;
-            btn.disabled = false;
+        } else {
+            status.innerHTML = "<span style='color: #ff4444;'>●</span> Hardware Incompatible";
         }
-    };
-</script>
+
+        btn.onclick = async () => {
+            const userPrompt = document.getElementById('prompt').value || "Cinematic viral drone shot";
+            btn.disabled = true;
+            progCont.style.display = 'block';
+            startTime = Date.now();
+
+            try {
+                const model_id = 'onnx-community/LTX-Video-0.1-q4';
+                
+                // Load LTX-Video 2.3 Class
+                const model = await LTXVideoForGenerator.from_pretrained(model_id, {
+                    device: 'webgpu',
+                    dtype: 'q4',
+                    progress_callback: (data) => {
+                        if (data.status === 'progress') {
+                            const p = data.progress;
+                            fill.style.width = p.toFixed(2) + '%';
+                            progText.innerText = `Compressing: ${p.toFixed(2)}%`;
+                            
+                            // High-Speed Time Estimation
+                            const elapsed = (Date.now() - startTime) / 1000;
+                            const remaining = (elapsed / p * 100) - elapsed;
+                            const mins = Math.floor(remaining / 60);
+                            const secs = Math.floor(remaining % 60);
+                            
+                            if (p > 1) {
+                                timeText.innerText = mins > 0 ? `${mins}m ${secs}s left` : `${secs}s left`;
+                            }
+                        }
+                    }
+                });
+
+                const tokenizer = await AutoTokenizer.from_pretrained(model_id);
+                
+                progText.innerText = "LTX: Rendering Pixels...";
+                timeText.innerText = "Processing...";
+
+                const { video: videoBlob } = await model.generate(userPrompt, tokenizer, {
+                    num_frames: 16,
+                    width: 512,
+                    height: 320,
+                });
+
+                video.src = URL.createObjectURL(videoBlob);
+                video.style.display = 'block';
+                progCont.style.display = 'none';
+                btn.disabled = false;
+                status.innerText = "✅ Video Mastered Successfully";
+
+            } catch (err) {
+                console.error(err);
+                status.innerHTML = `<span style='color:#ff4444;'>Engine Error: ${err.message.split('at')[0]}</span>`;
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
