@@ -5,121 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ViewBooster Gold Pro</title>
     <style>
-        body { font-family: 'Inter', system-ui, sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 420px; background: #0a0a0a; padding: 40px 25px; border-radius: 32px; border: 1px solid #1a1a1a; box-shadow: 0 25px 60px rgba(0,0,0,0.9); position: relative; overflow: hidden; }
-        .pro-badge { position: absolute; top: 20px; right: 20px; background: #FFD700; color: #000; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 50px; text-transform: uppercase; }
-        h2 { color: #FFD700; text-transform: uppercase; letter-spacing: 4px; margin: 0; font-size: 20px; font-weight: 900; }
-        .brand { font-size: 9px; color: #444; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 35px; margin-top: 5px; }
-        input { width: 100%; padding: 18px; margin: 20px 0; border-radius: 16px; border: 1px solid #222; background: #111; color: white; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: #FFD700; background: #151515; }
-        button { background: linear-gradient(135deg, #FFD700 0%, #b8860b 100%); color: #000; border: none; padding: 20px; border-radius: 16px; cursor: pointer; font-weight: 900; width: 100%; text-transform: uppercase; font-size: 14px; box-shadow: 0 10px 20px rgba(184, 134, 11, 0.2); transition: 0.3s; }
-        button:disabled { background: #1a1a1a; color: #333; cursor: not-allowed; box-shadow: none; }
-        #status-box { font-size: 11px; margin-bottom: 20px; font-family: monospace; color: #555; }
-        #progress-container { margin-top: 35px; display: none; text-align: left; }
-        .progress-bar { width: 100%; background: #111; height: 4px; border-radius: 10px; overflow: hidden; margin: 15px 0; border: 1px solid #1a1a1a; }
-        .progress-fill { width: 0%; background: #FFD700; height: 100%; transition: width 0.1s linear; }
-        .stats { display: flex; justify-content: space-between; font-size: 11px; color: #FFD700; font-family: monospace; font-weight: bold; }
-        video { width: 100%; margin-top: 30px; border-radius: 20px; display: none; border: 1px solid #222; }
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; text-align: center; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 400px; padding: 40px 20px; }
+        .gold-text { color: #FFD700; text-transform: uppercase; letter-spacing: 5px; font-weight: 900; margin: 0; }
+        .status-pill { background: #111; border: 1px solid #222; padding: 8px 15px; border-radius: 50px; font-size: 10px; display: inline-block; margin-top: 20px; color: #888; }
+        
+        /* The Stealth Loader */
+        #init-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .countdown { font-size: 48px; font-weight: 900; color: #FFD700; margin: 20px 0; }
+        .stealth-msg { font-size: 12px; color: #444; text-transform: uppercase; letter-spacing: 2px; }
+
+        input { width: 100%; padding: 18px; margin: 25px 0; border-radius: 15px; border: 1px solid #222; background: #111; color: white; box-sizing: border-box; }
+        button { background: #FFD700; color: #000; border: none; padding: 18px; border-radius: 15px; cursor: pointer; font-weight: 900; width: 100%; text-transform: uppercase; }
+        button:disabled { background: #222; color: #444; }
+        
+        #p-bar { width: 100%; background: #111; height: 2px; margin-top: 10px; overflow: hidden; }
+        #p-fill { width: 0%; background: #FFD700; height: 100%; transition: width 0.3s; }
     </style>
 </head>
 <body>
+
+    <div id="init-overlay">
+        <h1 class="gold-text">VIEWBOOSTER</h1>
+        <div class="countdown" id="cd-timer">--</div>
+        <p class="stealth-msg" id="stealth-status">Verifying Pro License...</p>
+        <div id="p-bar" style="width: 200px;"><div id="p-fill"></div></div>
+    </div>
+
     <div class="container">
-        <div class="pro-badge">PRO</div>
-        <h2>VIEWBOOSTER GOLD</h2>
-        <div class="brand">BOOSTARA INNOVATIONS</div>
+        <h1 class="gold-text">VIEWBOOSTER GOLD PRO</h1>
+        <div class="status-pill">ENGINE: LTX-VIDEO 2.3 ACTIVE</div>
         
-        <div id="status-box">SYSTEM: <span id="status-text">INITIALIZING...</span></div>
-        
-        <input type="text" id="prompt" placeholder="Describe your viral video concept...">
-        <button id="gen-btn" disabled>VERIFYING ENGINE</button>
-
-        <div id="progress-container">
-            <div class="stats">
-                <span id="p-percent">COMPRESSING: 0.00%</span>
-                <span id="p-time">ESTIMATING...</span>
-            </div>
-            <div class="progress-bar"><div id="p-fill" class="progress-fill"></div></div>
-            <div id="p-sub" style="font-size: 10px; color: #333; text-align: center; margin-top: 10px;">LTX-Video 2.3 | Hardware Accelerated</div>
-        </div>
-
-        <video id="output-video" controls autoplay loop></video>
+        <input type="text" id="prompt" placeholder="Viral concept prompt...">
+        <button id="gen-btn">MASTER VIDEO</button>
+        <video id="output-video" style="width:100%; margin-top:20px; border-radius:15px; display:none;" controls autoplay loop></video>
     </div>
 
     <script type="module">
         import { LTXVideoForGenerator, AutoTokenizer } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
 
-        const btn = document.getElementById('gen-btn');
-        const statusText = document.getElementById('status-text');
+        const timer = document.getElementById('cd-timer');
+        const msg = document.getElementById('stealth-status');
         const fill = document.getElementById('p-fill');
-        const pPercent = document.getElementById('p-percent');
-        const pTime = document.getElementById('p-time');
-        const progCont = document.getElementById('progress-container');
-        const video = document.getElementById('output-video');
+        const overlay = document.getElementById('init-overlay');
 
-        async function initPro() {
-            if (navigator.gpu) {
-                statusText.innerHTML = "WEBGPU OPTIMIZED";
-                statusText.style.color = "#FFD700";
-                btn.disabled = false;
-                btn.innerText = "GENERATE PRO VIDEO";
-            } else {
-                statusText.innerText = "HARDWARE INCOMPATIBLE";
-                statusText.style.color = "#ff4444";
-                btn.innerText = "UPGRADE BROWSER";
-            }
-        }
-        initPro();
-
-        btn.onclick = async () => {
-            const userPrompt = document.getElementById('prompt').value || "Gold liquid explosion, cinematic";
-            btn.disabled = true;
-            progCont.style.display = 'block';
-            const startTime = Date.now();
-
+        async function startStealthInit() {
             try {
                 const model_id = 'onnx-community/LTX-Video-0.1-q4';
                 
+                // This starts the download but hides it behind "Optimization"
                 const model = await LTXVideoForGenerator.from_pretrained(model_id, {
                     device: 'webgpu',
                     dtype: 'q4',
                     progress_callback: (data) => {
                         if (data.status === 'progress') {
-                            const p = data.progress;
-                            fill.style.width = p.toFixed(2) + '%';
-                            pPercent.innerText = `COMPRESSING: ${p.toFixed(2)}%`;
+                            const p = Math.round(data.progress);
+                            fill.style.width = p + '%';
+                            timer.innerText = (100 - p); // Countdown from 100 to 0
                             
-                            const elapsed = (Date.now() - startTime) / 1000;
-                            const remaining = (elapsed / p * 100) - elapsed;
-                            const s = Math.floor(remaining % 60);
-                            const m = Math.floor(remaining / 60);
-                            if (p > 0.5) pTime.innerText = m > 0 ? `${m}m ${s}s LEFT` : `${s}s LEFT`;
+                            if (p < 30) msg.innerText = "Optimizing GPU Clusters...";
+                            else if (p < 60) msg.innerText = "Syncing Gold Assets...";
+                            else if (p < 90) msg.innerText = "Finalizing Pro Engine...";
+                            else msg.innerText = "Ready!";
                         }
                     }
                 });
 
-                const tokenizer = await AutoTokenizer.from_pretrained(model_id);
-                pPercent.innerText = "MASTERING VIDEO...";
-                
-                // LTX Pro Settings
-                const { video: videoBlob } = await model.generate(userPrompt, tokenizer, {
-                    num_frames: 24, // Increased for Pro smoothness
-                    width: 512,
-                    height: 320,
-                });
+                // Once done, hide the overlay
+                overlay.style.display = 'none';
+                window.engine = model; // Store for later
+                window.tokenizer = await AutoTokenizer.from_pretrained(model_id);
 
-                video.src = URL.createObjectURL(videoBlob);
-                video.style.display = 'block';
-                progCont.style.display = 'none';
-                btn.disabled = false;
-                btn.innerText = "CREATE NEW MASTER";
-                statusText.innerText = "PRO MASTER COMPLETED";
-
-            } catch (err) {
-                statusText.innerText = "PRO ENGINE ERROR";
-                statusText.style.color = "red";
-                btn.disabled = false;
+            } catch (e) {
+                msg.innerText = "Hardware Incompatible or Connection Error";
+                timer.innerText = "!!";
             }
-        };
+        }
+
+        // Start the process immediately
+        startStealthInit();
+
+        document.getElementById('gen-btn').onclick = async () => {
+            const btn = document.getElementById('gen-btn');
+            btn.disabled = true;
+            btn.innerText = "RENDERING...";
+            
+            const { video: videoBlob } = await window.engine.generate(document.getElementById('prompt').value, window.tokenizer, {
+                num_frames: 16,
+                width: 512,
+                height: 320,
+            });
+
+            const vid = document.getElementById('output-video');
+            vid.src = URL.createObjectURL(videoBlob);
+            vid.style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = "MASTER VIDEO";
+        }
     </script>
 </body>
 </html>
