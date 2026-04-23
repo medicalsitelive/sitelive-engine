@@ -1,43 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Sitelive Universe | WebGPU Engine</title>
-    <style>body { font-family: sans-serif; text-align: center; padding: 50px; background: #111; color: white; }</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitelive Universe | AI Creator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f0f0f; color: white; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; }
+        button { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        #progress-container { margin: 20px 0; display: none; }
+        .progress-bar { width: 100%; background: #333; height: 10px; border-radius: 5px; overflow: hidden; }
+        .progress-fill { width: 0%; background: #007bff; height: 100%; transition: width 0.3s; }
+        video { width: 100%; margin-top: 20px; border-radius: 10px; display: none; }
+    </style>
 </head>
 <body>
-    <h1>Boostara Innovations</h1>
-    <p>WebGPU Status: <span id="status">Checking...</span></p>
-    <button id="gen-btn" style="padding: 15px 30px; font-size: 18px; display: none;">Generate Video</button>
+    <div class="container">
+        <h2>Sitelive Universe</h2>
+        <p id="status">Checking WebGPU...</p>
+        
+        <input type="text" id="prompt" placeholder="Describe your video (e.g. A futuristic clinic)">
+        <button id="gen-btn" disabled>Create Video</button>
+
+        <div id="progress-container">
+            <p id="progress-text">Downloading Engine: 0%</p>
+            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        </div>
+
+        <video id="output-video" controls></video>
+    </div>
 
     <script type="module">
-        // Import Transformers.js v3 from CDN
         import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
 
-        const statusEl = document.getElementById('status');
         const btn = document.getElementById('gen-btn');
+        const status = document.getElementById('status');
+        const fill = document.getElementById('progress-fill');
+        const progText = document.getElementById('progress-text');
+        const progCont = document.getElementById('progress-container');
+        const video = document.getElementById('output-video');
 
-        // Check if user's phone supports WebGPU
         if (navigator.gpu) {
-            statusEl.innerText = "✅ Ready (WebGPU Active)";
-            statusEl.style.color = "lime";
-            btn.style.display = "inline-block";
+            status.innerText = "✅ System Ready";
+            btn.disabled = false;
         } else {
-            statusEl.innerText = "❌ Not Supported (Browser too old)";
-            statusEl.style.color = "red";
+            status.innerText = "❌ WebGPU Not Supported";
         }
 
         btn.onclick = async () => {
-            statusEl.innerText = "🌀 Loading 4-bit Engine... (One-time download)";
-            // This runs the engine entirely on the user's phone
-            const pipe = await pipeline('text-to-video', 'onnx-community/Wan2.1-1.3B-Instruct', {
+            const userPrompt = document.getElementById('prompt').value || "A cinematic landscape";
+            btn.disabled = true;
+            progCont.style.display = 'block';
+
+            // Start the pipeline with a progress callback
+            const generator = await pipeline('text-to-video', 'onnx-community/Wan2.1-1.3B-Instruct', {
                 device: 'webgpu',
-                dtype: 'q4' // Shrinks size for mobile users
+                dtype: 'q4',
+                progress_callback: (data) => {
+                    if (data.status === 'progress') {
+                        const p = Math.round(data.progress);
+                        fill.style.width = p + '%';
+                        progText.innerText = `Loading Engine: ${p}%`;
+                    }
+                }
             });
-            statusEl.innerText = "🚀 Engine Ready. Generating...";
-            const output = await pipe("A futuristic city in Nairobi");
-            console.log(output);
+
+            progText.innerText = "Generating Video Pixels...";
+            const result = await generator(userPrompt);
+            
+            // Show the result
+            video.src = URL.createObjectURL(result.video);
+            video.style.display = 'block';
+            progCont.style.display = 'none';
+            btn.disabled = false;
         };
     </script>
 </body>
 </html>
-
