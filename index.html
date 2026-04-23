@@ -5,142 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ViewBooster Gold Pro | Neural Master</title>
     <style>
-        :root { --gold: #FFD700; --dark: #000; }
-        body, html { margin: 0; padding: 0; background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
-
-        /* The "Beyond Human" Background */
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; filter: blur(1px); }
-
-        /* Scanning Overlay Layer */
-        #stealth-overlay { 
-            position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px); transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        :root { 
+            --gold: #FFD700; 
+            --electric-blue: #0072ff; 
+            --dark-deep: #00040a; 
+        }
+        
+        body, html { 
+            margin: 0; padding: 0; 
+            background: var(--dark-deep); 
+            color: #fff; 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            overflow: hidden; 
+            height: 100vh; 
         }
 
-        .scanner-line {
-            position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            top: 0; animation: scan 3s linear infinite; opacity: 0.3;
+        /* 🌌 Deep Blue & Gold Background Canvas */
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
+
+        /* 🛡️ Stealth Initialization Layer */
+        #stealth-overlay { 
+            position: fixed; inset: 0; z-index: 100; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            background: radial-gradient(circle at center, rgba(0, 50, 100, 0.4) 0%, var(--dark-deep) 100%);
+            backdrop-filter: blur(20px); 
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scanning-beam {
+            position: absolute; width: 100%; height: 3px; 
+            background: linear-gradient(90deg, transparent, var(--electric-blue), var(--gold), transparent);
+            top: 0; animation: scan 4s linear infinite; opacity: 0.6;
         }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        .percentage-display { 
-            font-size: 84px; font-weight: 900; color: var(--gold); 
-            text-shadow: 0 0 60px rgba(255, 215, 0, 0.4); margin: 0;
-            font-variant-numeric: tabular-nums; letter-spacing: -4px;
-        }
-
         #data-prompt { 
-            border: 1px solid rgba(255, 215, 0, 0.3); padding: 40px; border-radius: 40px; 
-            background: rgba(10, 10, 10, 0.8); text-align: center; max-width: 320px;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
+            border: 1px solid rgba(0, 114, 255, 0.3); 
+            padding: 40px; border-radius: 40px; 
+            background: rgba(0, 5, 15, 0.9); 
+            text-align: center; max-width: 340px;
+            box-shadow: 0 0 60px rgba(0, 114, 255, 0.2), 0 0 20px rgba(255, 215, 0, 0.1);
         }
 
-        .active-alert {
-            background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold);
-            color: var(--gold); padding: 15px 30px; border-radius: 50px;
-            font-weight: 800; font-size: 12px; letter-spacing: 2px;
-            margin-top: 30px; text-transform: uppercase; animation: pulse 2s infinite;
+        .percentage-display { 
+            font-size: 80px; font-weight: 900; 
+            background: linear-gradient(135deg, var(--gold) 30%, var(--electric-blue) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 0; letter-spacing: -3px; filter: drop-shadow(0 0 20px rgba(0, 114, 255, 0.3));
         }
 
-        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
+        .status-alert {
+            background: rgba(0, 114, 255, 0.1); 
+            border: 1px solid var(--electric-blue);
+            color: #fff; padding: 15px 30px; border-radius: 50px;
+            font-weight: 800; font-size: 11px; letter-spacing: 2px;
+            margin-top: 30px; text-transform: uppercase;
+        }
 
-        /* Main Interface */
+        #auth-btn { 
+            background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%); 
+            color: #000; border: none; padding: 20px 40px; 
+            border-radius: 20px; cursor: pointer; font-weight: 900; 
+            width: 100%; text-transform: uppercase; letter-spacing: 2px;
+            margin-top: 25px; transition: 0.3s;
+        }
+        #auth-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
+
+        /* 🚀 Main Pro Interface */
         #main-app { 
             display: none; opacity: 0; z-index: 50; width: 90%; max-width: 420px;
             text-align: center; transition: opacity 1.5s ease;
         }
 
-        .gold-card {
-            background: rgba(15, 15, 15, 0.95); padding: 40px 30px; border-radius: 45px;
-            border: 1px solid #222; box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+        .pro-card {
+            background: rgba(0, 8, 20, 0.95); 
+            padding: 40px 30px; border-radius: 45px;
+            border: 1px solid rgba(0, 114, 255, 0.2); 
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
         }
 
-        h2 { color: var(--gold); letter-spacing: 8px; margin: 0; font-weight: 900; }
-        .tagline { font-size: 10px; color: #555; letter-spacing: 4px; margin-bottom: 40px; }
+        h2 { 
+            background: linear-gradient(90deg, var(--gold), #fff, var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 6px; margin: 0; font-weight: 900; 
+        }
 
         input { 
-            width: 100%; padding: 22px; margin-bottom: 20px; border-radius: 20px;
-            border: 1px solid #333; background: #050505; color: var(--gold); font-size: 16px;
-            box-sizing: border-box; outline: none; text-align: center;
+            width: 100%; padding: 22px; margin: 25px 0; border-radius: 20px;
+            border: 1px solid #1a2a40; background: #000b1a; 
+            color: var(--gold); font-size: 16px; box-sizing: border-box; outline: none;
         }
-        
-        button { 
-            background: linear-gradient(135deg, #FFD700 0%, #b8860b 100%); color: #000; 
-            border: none; padding: 22px; border-radius: 20px; cursor: pointer; 
-            font-weight: 900; width: 100%; text-transform: uppercase; letter-spacing: 2px;
+        input:focus { border-color: var(--electric-blue); }
+
+        .gen-trigger {
+            background: linear-gradient(135deg, var(--electric-blue) 0%, #004599 100%);
+            color: #fff; border: none; padding: 22px; border-radius: 20px;
+            cursor: pointer; font-weight: 900; width: 100%;
+            text-transform: uppercase; letter-spacing: 2px;
         }
 
-        video { width: 100%; margin-top: 30px; border-radius: 25px; display: none; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        video { width: 100%; margin-top: 30px; border-radius: 25px; display: none; border: 2px solid var(--electric-blue); }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
-    <div class="scanner-line"></div>
+    <div class="scanning-beam"></div>
 
     <div id="stealth-overlay">
         <div id="data-prompt">
-            <div style="font-size: 40px; margin-bottom: 10px;">👑</div>
-            <h2 style="font-size: 18px; color: var(--gold);">NEURAL ENGINE SYNC</h2>
-            <p style="font-size: 11px; color: #777; line-height: 1.8; margin-top: 15px;">
-                ViewBooster Pro is preparing high-fidelity assets (~1.1GB). 
+            <div style="font-size: 40px; margin-bottom: 15px;">⚡</div>
+            <h2 style="font-size: 18px;">NEURAL CORE ACCESS</h2>
+            <p style="font-size: 11px; color: #8899af; line-height: 1.8; margin-top: 15px;">
+                ViewBooster Pro is syncing the GSX-Gold Engine (~1.1GB). 
                 <br><br>
-                <span style="color: #fff;">USE WIFI FOR MAXIMUM SPEED.</span>
+                <span style="color: var(--electric-blue);">WIFI RECOMMENDED FOR HIGH-SPEED SYNC.</span>
             </p>
-            <button id="auth-btn" style="margin-top: 25px; padding: 15px;">AUTHORIZE SYNC</button>
+            <button id="auth-btn">AUTHORIZE & SYNC</button>
         </div>
 
         <div id="sync-ui" style="display:none; text-align: center;">
             <p class="percentage-display" id="count">0.00%</p>
-            <div class="active-alert" id="active-msg">TEXT BAR UNLOCKING IN ... %</div>
-            <p style="font-size: 10px; color: #444; letter-spacing: 5px; margin-top: 20px;" id="step-txt">COALESCING QUANTUM DATA...</p>
+            <div class="status-alert" id="status-txt">ESTABLISHING NEURAL LINK...</div>
+            <p style="font-size: 9px; color: #445566; letter-spacing: 4px; margin-top: 25px;">ENCRYPTED BY BOOSTARA INNOVATIONS</p>
         </div>
     </div>
 
     <div id="main-app">
-        <div class="gold-card">
+        <div class="pro-card">
             <h2>VIEWBOOSTER</h2>
-            <div class="tagline">GOLD PRO MASTER</div>
-            <input type="text" id="prompt" placeholder="Describe the viral vision...">
-            <button id="gen-btn">EXECUTE RENDERING</button>
+            <div style="font-size: 9px; color: var(--electric-blue); letter-spacing: 3px; margin-top: 5px;">GOLD PRO EDITION</div>
+            <input type="text" id="prompt" placeholder="Enter viral prompt here...">
+            <button id="gen-btn" class="gen-trigger">EXECUTE RENDERING</button>
             <video id="out-vid" controls autoplay loop></video>
         </div>
     </div>
 
     <script type="module">
-        // 🛡️ SECURITY BLOCK
-        const authHost = "medicalsitelive.github.io"; 
+        // 🔒 DOMAIN SECURITY
+        const authHost = "medicalsitelive.github.io";
         if (window.location.hostname !== authHost && window.location.hostname !== "localhost") {
-            document.body.innerHTML = "<h2 style='color:var(--gold); text-align:center; margin-top:45vh;'>UNAUTHORIZED ACCESS</h2>";
+            document.body.innerHTML = "<h2 style='color:white; text-align:center; padding-top:40vh;'>UNAUTHORIZED ACCESS</h2>";
             throw new Error();
         }
 
         import { LTXVideoForGenerator as GSX_ENGINE, AutoTokenizer as GSX_KEY } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
 
         const count = document.getElementById('count');
-        const activeMsg = document.getElementById('active-msg');
-        const stepTxt = document.getElementById('step-txt');
+        const statusTxt = document.getElementById('status-txt');
         const overlay = document.getElementById('stealth-overlay');
         const mainApp = document.getElementById('main-app');
         const authBtn = document.getElementById('auth-btn');
 
-        // BEYOND-HUMAN BACKGROUND SCRIPT
+        // 🎨 ELECTRIC BACKGROUND SCRIPT
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         function init() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            particles = Array.from({length: 80}, () => ({
-                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                r: Math.random() * 2 + 1, d: Math.random() * 50 + 10,
-                s: Math.random() * 0.5 + 0.1
+            particles = Array.from({length: 100}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.5 + 0.5,
+                s: Math.random() * 0.8 + 0.2,
+                c: Math.random() > 0.5 ? '#FFD700' : '#0072ff'
             }));
         }
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(255, 215, 0, 0.3)";
             particles.forEach(p => {
+                ctx.fillStyle = p.c;
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
                 p.y -= p.s; if(p.y < 0) p.y = canvas.height;
             });
@@ -148,52 +183,59 @@
         }
         init(); draw();
 
-        // AUTH & SYNC SCRIPT
-        authBtn.onclick = () => {
+        // 🚀 SYNC SCRIPT WITH CPU FALLBACK
+        authBtn.onclick = async () => {
             document.getElementById('data-prompt').style.display = 'none';
             document.getElementById('sync-ui').style.display = 'block';
-            startSync();
-        };
-
-        async function startSync() {
+            
             try {
                 const GSX_ID = 'onnx-community/LTX-Video-0.1-q4';
+                
+                // Hardware Probe
+                const useGPU = navigator.gpu ? 'webgpu' : 'wasm';
+                
                 const model = await GSX_ENGINE.from_pretrained(GSX_ID, {
-                    device: 'webgpu', dtype: 'q4',
+                    device: useGPU,
+                    dtype: useGPU === 'webgpu' ? 'q4' : 'fp32',
                     progress_callback: (d) => {
                         if (d.status === 'progress') {
                             const p = d.progress.toFixed(2);
                             count.innerText = p + '%';
-                            activeMsg.innerText = `TEXT BAR UNLOCKS AT 100%`;
-                            if (p < 50) stepTxt.innerText = "COALESCING QUANTUM DATA...";
-                            else stepTxt.innerText = "ENCRYPTING NEURAL ASSETS...";
+                            if (p < 40) statusTxt.innerText = "COALESCING DATA...";
+                            else if (p < 80) statusTxt.innerText = "OPTIMIZING GPU...";
+                            else statusTxt.innerText = "FINALIZING LINK...";
                         }
                     }
                 });
+
                 window.TOKEN = await GSX_KEY.from_pretrained(GSX_ID);
                 window.CORE = model;
 
-                overlay.style.transform = "translateY(-100%)";
+                overlay.style.transform = "scale(1.1)";
+                overlay.style.opacity = "0";
                 setTimeout(() => {
                     overlay.style.display = 'none';
                     mainApp.style.display = 'block';
-                    setTimeout(() => mainApp.style.opacity = '1', 50);
+                    setTimeout(() => mainApp.style.opacity = '1', 100);
                 }, 1000);
-            } catch (e) {
-                stepTxt.innerText = "ERROR: HARDWARE INCOMPATIBLE";
-            }
-        }
 
+            } catch (e) {
+                statusTxt.innerText = "ERROR: UPDATE SYSTEM WEBVIEW";
+                console.error(e);
+            }
+        };
+
+        // 🎬 GENERATION ACTION
         document.getElementById('gen-btn').onclick = async () => {
             const btn = document.getElementById('gen-btn');
-            btn.disabled = true; btn.innerText = "MASTERING...";
+            btn.disabled = true; btn.innerText = "MASTERING VIDEO...";
             try {
                 const { video: blob } = await window.CORE.generate(document.getElementById('prompt').value, window.TOKEN, {
                     num_frames: 16, width: 512, height: 320
                 });
                 const v = document.getElementById('out-vid');
                 v.src = URL.createObjectURL(blob); v.style.display = 'block';
-            } catch (err) { alert("Memory Limit. Close other apps."); }
+            } catch (err) { alert("Hardware Limit. Please clear RAM."); }
             btn.disabled = false; btn.innerText = "EXECUTE RENDERING";
         };
     </script>
