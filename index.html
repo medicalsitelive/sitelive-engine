@@ -3,122 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ViewBooster Gold Pro</title>
+    <title>ViewBooster Gold Pro | Neural Master</title>
     <style>
-        /* Cyber-Gold Experience Architecture */
-        body { 
-            margin: 0; padding: 0; 
-            background: radial-gradient(circle at center, #1a1400 0%, #000 100%);
-            color: #fff; font-family: 'Inter', -apple-system, sans-serif;
-            overflow: hidden; height: 100vh; display: flex;
-            align-items: center; justify-content: center;
-        }
+        :root { --gold: #FFD700; --dark: #000; }
+        body, html { margin: 0; padding: 0; background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; opacity: 0.5; }
+        /* The "Beyond Human" Background */
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; filter: blur(1px); }
 
-        /* Stealth & Data Guard UI */
+        /* Scanning Overlay Layer */
         #stealth-overlay { 
-            position: relative; z-index: 10; width: 100%; max-width: 400px;
-            text-align: center; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px); transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .spinner-ring {
-            width: 100px; height: 100px; border: 2px solid rgba(255, 215, 0, 0.05);
-            border-top: 2px solid #FFD700; border-radius: 50%;
-            animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            margin: 0 auto 30px; box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+        .scanner-line {
+            position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            top: 0; animation: scan 3s linear infinite; opacity: 0.3;
         }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
         .percentage-display { 
-            font-size: 72px; font-weight: 900; color: #FFD700; 
-            text-shadow: 0 0 50px rgba(255, 215, 0, 0.6); margin: 0;
-            font-variant-numeric: tabular-nums; letter-spacing: -2px;
+            font-size: 84px; font-weight: 900; color: var(--gold); 
+            text-shadow: 0 0 60px rgba(255, 215, 0, 0.4); margin: 0;
+            font-variant-numeric: tabular-nums; letter-spacing: -4px;
         }
 
-        #data-prompt { background: rgba(10,10,10,0.9); padding: 30px; border-radius: 25px; border: 1px solid #333; }
+        #data-prompt { 
+            border: 1px solid rgba(255, 215, 0, 0.3); padding: 40px; border-radius: 40px; 
+            background: rgba(10, 10, 10, 0.8); text-align: center; max-width: 320px;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
 
         .active-alert {
-            background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.5);
-            color: #FFD700; padding: 18px 35px; border-radius: 14px;
-            font-weight: 800; font-size: 13px; letter-spacing: 2px;
-            margin-top: 35px; display: inline-block; text-transform: uppercase;
+            background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold);
+            color: var(--gold); padding: 15px 30px; border-radius: 50px;
+            font-weight: 800; font-size: 12px; letter-spacing: 2px;
+            margin-top: 30px; text-transform: uppercase; animation: pulse 2s infinite;
         }
 
-        .loading-step { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 5px; margin-top: 20px; }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* Main Pro Interface */
+        /* Main Interface */
         #main-app { 
-            display: none; opacity: 0; z-index: 20; width: 90%; max-width: 420px;
-            background: rgba(8, 8, 8, 0.98); padding: 35px; border-radius: 35px;
-            border: 1px solid #222; text-align: center; backdrop-filter: blur(20px);
+            display: none; opacity: 0; z-index: 50; width: 90%; max-width: 420px;
+            text-align: center; transition: opacity 1.5s ease;
         }
 
-        h2 { color: #FFD700; letter-spacing: 6px; margin: 0; font-weight: 900; text-transform: uppercase; }
-        .brand-tag { font-size: 9px; color: #444; letter-spacing: 5px; margin-top: 8px; margin-bottom: 30px; }
+        .gold-card {
+            background: rgba(15, 15, 15, 0.95); padding: 40px 30px; border-radius: 45px;
+            border: 1px solid #222; box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+        }
+
+        h2 { color: var(--gold); letter-spacing: 8px; margin: 0; font-weight: 900; }
+        .tagline { font-size: 10px; color: #555; letter-spacing: 4px; margin-bottom: 40px; }
 
         input { 
-            width: 100%; padding: 20px; margin: 20px 0; border-radius: 18px;
-            border: 1px solid #333; background: #000; color: #FFD700; font-size: 16px;
-            box-sizing: border-box; outline: none; transition: 0.3s;
+            width: 100%; padding: 22px; margin-bottom: 20px; border-radius: 20px;
+            border: 1px solid #333; background: #050505; color: var(--gold); font-size: 16px;
+            box-sizing: border-box; outline: none; text-align: center;
         }
         
         button { 
-            background: linear-gradient(135deg, #FFD700 0%, #b8860b 100%); color: #000; border: none; padding: 22px;
-            border-radius: 18px; cursor: pointer; font-weight: 900; width: 100%;
-            text-transform: uppercase; font-size: 14px; letter-spacing: 1px;
+            background: linear-gradient(135deg, #FFD700 0%, #b8860b 100%); color: #000; 
+            border: none; padding: 22px; border-radius: 20px; cursor: pointer; 
+            font-weight: 900; width: 100%; text-transform: uppercase; letter-spacing: 2px;
         }
-        button:disabled { background: #222; color: #444; }
 
-        video { width: 100%; margin-top: 25px; border-radius: 20px; display: none; border: 1px solid #333; }
+        video { width: 100%; margin-top: 30px; border-radius: 25px; display: none; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
+    <div class="scanner-line"></div>
 
     <div id="stealth-overlay">
         <div id="data-prompt">
-            <h2 style="color:#FFD700; letter-spacing: 2px;">PRO ASSET SYNC</h2>
-            <p style="font-size:12px; color:#aaa; line-height:1.6; margin: 20px 0;">
-                ViewBooster Gold requires a one-time neural mastering sync (~1.1GB). 
+            <div style="font-size: 40px; margin-bottom: 10px;">👑</div>
+            <h2 style="font-size: 18px; color: var(--gold);">NEURAL ENGINE SYNC</h2>
+            <p style="font-size: 11px; color: #777; line-height: 1.8; margin-top: 15px;">
+                ViewBooster Pro is preparing high-fidelity assets (~1.1GB). 
                 <br><br>
-                <span style="color:#FFD700; font-weight:bold;">Recommended: Connect to Wi-Fi.</span>
+                <span style="color: #fff;">USE WIFI FOR MAXIMUM SPEED.</span>
             </p>
-            <button id="auth-sync-btn">AUTHORIZE & START</button>
+            <button id="auth-btn" style="margin-top: 25px; padding: 15px;">AUTHORIZE SYNC</button>
         </div>
 
-        <div id="sync-ui" style="display:none;">
-            <div class="spinner-ring"></div>
+        <div id="sync-ui" style="display:none; text-align: center;">
             <p class="percentage-display" id="count">0.00%</p>
-            <div class="loading-step" id="step-txt">Aligning Neural Assets...</div>
-            <div class="active-alert" id="active-msg">PRO INPUT ACTIVE AT 100%</div>
+            <div class="active-alert" id="active-msg">TEXT BAR UNLOCKING IN ... %</div>
+            <p style="font-size: 10px; color: #444; letter-spacing: 5px; margin-top: 20px;" id="step-txt">COALESCING QUANTUM DATA...</p>
         </div>
     </div>
 
     <div id="main-app">
-        <h2>VIEWBOOSTER</h2>
-        <div class="brand-tag">GOLD PRO EDITION</div>
-        <input type="text" id="prompt" placeholder="Viral command prompt...">
-        <button id="gen-btn">EXECUTE PRO MASTER</button>
-        <div id="render-msg" style="font-size:11px; color:#FFD700; margin-top:15px; display:none;">GSX NEURAL MASTERING...</div>
-        <video id="out-vid" controls autoplay loop></video>
+        <div class="gold-card">
+            <h2>VIEWBOOSTER</h2>
+            <div class="tagline">GOLD PRO MASTER</div>
+            <input type="text" id="prompt" placeholder="Describe the viral vision...">
+            <button id="gen-btn">EXECUTE RENDERING</button>
+            <video id="out-vid" controls autoplay loop></video>
+        </div>
     </div>
 
     <script type="module">
-        // 🛡️ SECURITY & DOMAIN LOCK
+        // 🛡️ SECURITY BLOCK
         const authHost = "medicalsitelive.github.io"; 
         if (window.location.hostname !== authHost && window.location.hostname !== "localhost") {
-            document.body.innerHTML = "<div style='color:#FFD700; text-align:center; padding-top:40vh;'><h2>AUTH ERROR</h2><p>INVALID BOOSTER DOMAIN</p></div>";
-            throw new Error("Lock");
+            document.body.innerHTML = "<h2 style='color:var(--gold); text-align:center; margin-top:45vh;'>UNAUTHORIZED ACCESS</h2>";
+            throw new Error();
         }
 
-        // 🛡️ ANTI-STEAL
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = e => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false; };
-
-        // Masking AI Libraries
         import { LTXVideoForGenerator as GSX_ENGINE, AutoTokenizer as GSX_KEY } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
 
         const count = document.getElementById('count');
@@ -126,91 +123,79 @@
         const stepTxt = document.getElementById('step-txt');
         const overlay = document.getElementById('stealth-overlay');
         const mainApp = document.getElementById('main-app');
-        const dataPrompt = document.getElementById('data-prompt');
-        const syncUI = document.getElementById('sync-ui');
-        const authBtn = document.getElementById('auth-sync-btn');
+        const authBtn = document.getElementById('auth-btn');
 
-        // Cinematic Background Animation
+        // BEYOND-HUMAN BACKGROUND SCRIPT
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let stars = [];
-        function initStars() {
+        let particles = [];
+        function init() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = Array.from({length: 150}, () => ({
+            particles = Array.from({length: 80}, () => ({
                 x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                size: Math.random() * 1.5, speed: Math.random() * 0.4 + 0.1
+                r: Math.random() * 2 + 1, d: Math.random() * 50 + 10,
+                s: Math.random() * 0.5 + 0.1
             }));
         }
-        function animate() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "#FFD700";
-            stars.forEach(s => {
-                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
-                s.y -= s.speed; if(s.y < 0) s.y = canvas.height;
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255, 215, 0, 0.3)";
+            particles.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+                p.y -= p.s; if(p.y < 0) p.y = canvas.height;
             });
-            requestAnimationFrame(animate);
+            requestAnimationFrame(draw);
         }
-        window.onresize = initStars; initStars(); animate();
+        init(); draw();
 
-        // Engine Authorization Logic
+        // AUTH & SYNC SCRIPT
         authBtn.onclick = () => {
-            dataPrompt.style.display = 'none';
-            syncUI.style.display = 'block';
-            launchGSX();
+            document.getElementById('data-prompt').style.display = 'none';
+            document.getElementById('sync-ui').style.display = 'block';
+            startSync();
         };
 
-        async function launchGSX() {
+        async function startSync() {
             try {
                 const GSX_ID = 'onnx-community/LTX-Video-0.1-q4';
-                const GSX_DATA = await GSX_ENGINE.from_pretrained(GSX_ID, {
+                const model = await GSX_ENGINE.from_pretrained(GSX_ID, {
                     device: 'webgpu', dtype: 'q4',
-                    progress_callback: (data) => {
-                        if (data.status === 'progress') {
-                            const p = data.progress.toFixed(2);
+                    progress_callback: (d) => {
+                        if (d.status === 'progress') {
+                            const p = d.progress.toFixed(2);
                             count.innerText = p + '%';
-                            activeMsg.innerText = `PRO INPUT ACTIVE AT 100%`;
-                            
-                            if (p < 33) stepTxt.innerText = "Syncing Neural Assets...";
-                            else if (p < 66) stepTxt.innerText = "Encrypting Gold Core...";
-                            else stepTxt.innerText = "Finalizing Pro Engine...";
+                            activeMsg.innerText = `TEXT BAR UNLOCKS AT 100%`;
+                            if (p < 50) stepTxt.innerText = "COALESCING QUANTUM DATA...";
+                            else stepTxt.innerText = "ENCRYPTING NEURAL ASSETS...";
                         }
                     }
                 });
+                window.TOKEN = await GSX_KEY.from_pretrained(GSX_ID);
+                window.CORE = model;
 
-                window.GSX_TOKEN = await GSX_KEY.from_pretrained(GSX_ID);
-                window.GSX_CORE = GSX_DATA;
-
-                overlay.style.transform = 'scale(1.1)';
-                overlay.style.opacity = '0';
+                overlay.style.transform = "translateY(-100%)";
                 setTimeout(() => {
                     overlay.style.display = 'none';
                     mainApp.style.display = 'block';
                     setTimeout(() => mainApp.style.opacity = '1', 50);
                 }, 1000);
-
             } catch (e) {
-                stepTxt.innerText = "System Integrity Check: Hardware Upgrade Required";
+                stepTxt.innerText = "ERROR: HARDWARE INCOMPATIBLE";
             }
         }
 
-        // Generation Core
         document.getElementById('gen-btn').onclick = async () => {
             const btn = document.getElementById('gen-btn');
-            const renderMsg = document.getElementById('render-msg');
-            btn.disabled = true; renderMsg.style.display = "block";
-            
+            btn.disabled = true; btn.innerText = "MASTERING...";
             try {
-                const { video: blob } = await window.GSX_CORE.generate(document.getElementById('prompt').value, window.GSX_TOKEN, {
+                const { video: blob } = await window.CORE.generate(document.getElementById('prompt').value, window.TOKEN, {
                     num_frames: 16, width: 512, height: 320
                 });
                 const v = document.getElementById('out-vid');
                 v.src = URL.createObjectURL(blob); v.style.display = 'block';
-            } catch (err) {
-                alert("Hardware Overflow: Close other apps.");
-            }
-            
-            btn.disabled = false; renderMsg.style.display = "none";
-        }
+            } catch (err) { alert("Memory Limit. Close other apps."); }
+            btn.disabled = false; btn.innerText = "EXECUTE RENDERING";
+        };
     </script>
 </body>
 </html>
