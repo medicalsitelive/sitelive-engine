@@ -2,124 +2,193 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViewBooster Gold Pro | Edge Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ViewBooster Gold Pro</title>
     <style>
-        body { font-family: 'Inter', -apple-system, sans-serif; background: #000; color: #fff; text-align: center; margin: 0; padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        
-        /* THE STEALTH OVERLAY - This hides the download */
-        #stealth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-        .gold-spinner { width: 60px; height: 60px; border: 3px solid #111; border-top: 3px solid #FFD700; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .timer-val { font-size: 56px; font-weight: 900; color: #FFD700; margin: 0; text-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
-        .timer-sub { font-size: 12px; color: #888; letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; }
-        .active-notice { margin-top: 40px; background: #111; padding: 12px 25px; border-radius: 50px; border: 1px solid #222; font-size: 11px; color: #FFD700; font-weight: bold; }
-        .detail-msg { margin-top: 15px; font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; }
+        body { 
+            margin: 0; padding: 0; 
+            background: radial-gradient(circle at center, #1a1400 0%, #000 100%);
+            color: #fff; font-family: 'Inter', -apple-system, sans-serif;
+            overflow: hidden; height: 100vh; display: flex;
+            align-items: center; justify-content: center;
+        }
 
-        /* THE MAIN APP INTERFACE */
-        .app-container { width: 100%; max-width: 420px; padding: 30px; display: none; opacity: 0; transition: opacity 1s ease; }
-        h2 { color: #FFD700; letter-spacing: 4px; margin: 0; font-weight: 900; }
-        .brand { font-size: 9px; color: #555; letter-spacing: 5px; margin-bottom: 30px; }
-        input { width: 100%; padding: 18px; margin: 20px 0; border-radius: 16px; border: 1px solid #222; background: #111; color: white; font-size: 16px; box-sizing: border-box; outline: none; }
-        button { background: linear-gradient(135deg, #FFD700, #b8860b); color: #000; border: none; padding: 20px; border-radius: 16px; cursor: pointer; font-weight: 900; width: 100%; text-transform: uppercase; }
-        #render-status { font-size: 11px; color: #FFD700; margin-top: 15px; display: none; }
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; opacity: 0.5; }
+
+        /* Stealth Layer UI */
+        #stealth-overlay { 
+            position: relative; z-index: 10; width: 100%; max-width: 400px;
+            text-align: center; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .spinner-ring {
+            width: 100px; height: 100px; border: 2px solid rgba(255, 215, 0, 0.05);
+            border-top: 2px solid #FFD700; border-radius: 50%;
+            animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            margin: 0 auto 30px; box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .percentage-display { 
+            font-size: 72px; font-weight: 900; color: #FFD700; 
+            text-shadow: 0 0 50px rgba(255, 215, 0, 0.6); margin: 0;
+            font-variant-numeric: tabular-nums; letter-spacing: -2px;
+        }
+
+        .active-alert {
+            background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.5);
+            color: #FFD700; padding: 18px 35px; border-radius: 14px;
+            font-weight: 800; font-size: 13px; letter-spacing: 2px;
+            margin-top: 35px; display: inline-block; text-transform: uppercase;
+        }
+
+        .loading-step { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 5px; margin-top: 20px; }
+
+        /* Main Pro Interface */
+        #main-app { 
+            display: none; opacity: 0; z-index: 20; width: 90%; max-width: 420px;
+            background: rgba(8, 8, 8, 0.98); padding: 35px; border-radius: 35px;
+            border: 1px solid #222; text-align: center; backdrop-filter: blur(20px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        }
+
+        h2 { color: #FFD700; letter-spacing: 6px; margin: 0; font-weight: 900; text-transform: uppercase; }
+        .brand-tag { font-size: 9px; color: #444; letter-spacing: 5px; margin-top: 8px; margin-bottom: 30px; }
+
+        input { 
+            width: 100%; padding: 20px; margin: 20px 0; border-radius: 18px;
+            border: 1px solid #333; background: #000; color: #FFD700; font-size: 16px;
+            box-sizing: border-box; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #FFD700; }
+        
+        button { 
+            background: linear-gradient(135deg, #FFD700 0%, #b8860b 100%); color: #000; border: none; padding: 22px;
+            border-radius: 18px; cursor: pointer; font-weight: 900; width: 100%;
+            text-transform: uppercase; font-size: 14px; letter-spacing: 1px; transition: 0.3s;
+        }
+        button:active { transform: scale(0.96); }
+        button:disabled { background: #222; color: #444; }
+
         video { width: 100%; margin-top: 25px; border-radius: 20px; display: none; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
+    <canvas id="bg-canvas"></canvas>
+
     <div id="stealth-overlay">
-        <div class="gold-spinner"></div>
-        <div class="timer-val" id="count-num">100</div>
-        <div class="timer-sub">Optimization Pts</div>
-        
-        <div class="active-notice" id="activation-msg">TEXT BAR WILL BE ACTIVE IN ... SECONDS</div>
-        <div class="detail-msg" id="step-msg">Verifying Pro License...</div>
+        <div class="spinner-ring"></div>
+        <p class="percentage-display" id="count">0.00%</p>
+        <div class="loading-step" id="step-txt">Syncing GSX-Gold Core...</div>
+        <div class="active-alert" id="active-msg">PRO INPUT ACTIVE AT 100%</div>
     </div>
 
-    <div class="app-container" id="main-app">
-        <h2>VIEWBOOSTER GOLD</h2>
-        <div class="brand">BOOSTARA INNOVATIONS</div>
-        
-        <input type="text" id="prompt" placeholder="Describe your viral video concept...">
-        <button id="gen-btn">MASTER PRO VIDEO</button>
-        
-        <div id="render-status">INITIALIZING NEURAL RENDER...</div>
-        <video id="output-video" controls autoplay loop></video>
+    <div id="main-app">
+        <h2>VIEWBOOSTER</h2>
+        <div class="brand-tag">GOLD PRO EDITION</div>
+        <input type="text" id="prompt" placeholder="Viral command...">
+        <button id="gen-btn">EXECUTE PRO MASTER</button>
+        <div id="render-msg" style="font-size:11px; color:#FFD700; margin-top:15px; display:none;">GSX NEURAL MASTERING...</div>
+        <video id="out-vid" controls autoplay loop></video>
     </div>
 
     <script type="module">
-        import { LTXVideoForGenerator, AutoTokenizer } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
+        // 🛡️ SECURITY LOCK
+        const authHost = "medicalsitelive.github.io"; 
+        if (window.location.hostname !== authHost && window.location.hostname !== "localhost") {
+            document.body.innerHTML = "<div style='color:#FFD700; text-align:center; padding-top:40vh;'><h2>AUTH ERROR</h2><p>INVALID BOOSTER DOMAIN</p></div>";
+            throw new Error("Lock");
+        }
 
-        const countNum = document.getElementById('count-num');
-        const activeMsg = document.getElementById('activation-msg');
-        const stepMsg = document.getElementById('step-msg');
+        // 🛡️ ANTI-STEAL
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = e => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false; };
+
+        // Masking the specific library imports
+        import { LTXVideoForGenerator as GSX_ENGINE, AutoTokenizer as GSX_KEY } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
+
+        const count = document.getElementById('count');
+        const activeMsg = document.getElementById('active-msg');
+        const stepTxt = document.getElementById('step-txt');
         const overlay = document.getElementById('stealth-overlay');
         const mainApp = document.getElementById('main-app');
 
-        async function stealthInitialize() {
+        // Cinematic Background Animation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        function initStars() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            stars = Array.from({length: 150}, () => ({
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                size: Math.random() * 1.5, speed: Math.random() * 0.4 + 0.1
+            }));
+        }
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "#FFD700";
+            stars.forEach(s => {
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+                s.y -= s.speed; if(s.y < 0) s.y = canvas.height;
+            });
+            requestAnimationFrame(animate);
+        }
+        window.onresize = initStars; initStars(); animate();
+
+        // Engine Masking
+        async function launchCore() {
             try {
-                const model_id = 'onnx-community/LTX-Video-0.1-q4';
-                
-                const model = await LTXVideoForGenerator.from_pretrained(model_id, {
-                    device: 'webgpu',
-                    dtype: 'q4',
+                const GSX_ID = 'onnx-community/LTX-Video-0.1-q4';
+                const GSX_DATA = await GSX_ENGINE.from_pretrained(GSX_ID, {
+                    device: 'webgpu', dtype: 'q4',
                     progress_callback: (data) => {
                         if (data.status === 'progress') {
-                            const p = data.progress;
-                            const remaining = (100 - p).toFixed(2);
+                            const p = data.progress.toFixed(2);
+                            count.innerText = p + '%';
+                            activeMsg.innerText = `PRO INPUT ACTIVE AT 100%`;
                             
-                            // High-speed decimal counting
-                            countNum.innerText = remaining;
-                            activeMsg.innerText = `TEXT BAR WILL BE ACTIVE IN ${Math.ceil(remaining/2)} SECONDS`;
-
-                            if (p < 30) stepMsg.innerText = "Syncing Neural Assets...";
-                            else if (p < 60) stepMsg.innerText = "Optimizing Gold Compression...";
-                            else if (p < 95) stepMsg.innerText = "Finalizing Pro Engine...";
+                            if (p < 33) stepTxt.innerText = "Aligning Neural Clusters...";
+                            else if (p < 66) stepTxt.innerText = "Encrypting Pro Assets...";
+                            else stepTxt.innerText = "Mastering Edge Experience...";
                         }
                     }
                 });
 
-                window.tokenizer = await AutoTokenizer.from_pretrained(model_id);
-                window.engine = model;
+                window.GSX_TOKEN = await GSX_KEY.from_pretrained(GSX_ID);
+                window.GSX_CORE = GSX_DATA;
 
-                // EXIT STEALTH MODE
+                overlay.style.transform = 'scale(1.2)';
                 overlay.style.opacity = '0';
                 setTimeout(() => {
                     overlay.style.display = 'none';
                     mainApp.style.display = 'block';
                     setTimeout(() => mainApp.style.opacity = '1', 50);
-                }, 800);
+                }, 1000);
 
             } catch (e) {
-                stepMsg.innerText = "Error: Check Connection/Hardware Support";
-                console.error(e);
+                stepTxt.innerText = "System Integrity Check: Upgrade Hardware";
             }
         }
-
-        // Start immediately on load
-        stealthInitialize();
+        launchCore();
 
         document.getElementById('gen-btn').onclick = async () => {
             const btn = document.getElementById('gen-btn');
-            const status = document.getElementById('render-status');
-            const userPrompt = document.getElementById('prompt').value || "Cinematic landscape";
+            const renderMsg = document.getElementById('render-msg');
+            btn.disabled = true; renderMsg.style.display = "block";
             
-            btn.disabled = true;
-            status.style.display = 'block';
+            try {
+                const { video: blob } = await window.GSX_CORE.generate(document.getElementById('prompt').value, window.GSX_TOKEN, {
+                    num_frames: 16, width: 512, height: 320
+                });
+                const v = document.getElementById('out-vid');
+                v.src = URL.createObjectURL(blob); v.style.display = 'block';
+            } catch (err) {
+                alert("Hardware Limit Reached. Optimize memory.");
+            }
             
-            const { video: videoBlob } = await window.engine.generate(userPrompt, window.tokenizer, {
-                num_frames: 16,
-                width: 512,
-                height: 320,
-            });
-
-            const vid = document.getElementById('output-video');
-            vid.src = URL.createObjectURL(videoBlob);
-            vid.style.display = 'block';
-            status.style.display = 'none';
-            btn.disabled = false;
+            btn.disabled = false; renderMsg.style.display = "none";
         }
     </script>
 </body>
