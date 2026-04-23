@@ -1,81 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitelive Universe | AI Creator</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f0f0f; color: white; text-align: center; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; }
-        button { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
-        button:disabled { background: #444; cursor: not-allowed; }
-        #progress-container { margin: 20px 0; display: none; }
-        .progress-bar { width: 100%; background: #333; height: 10px; border-radius: 5px; overflow: hidden; }
-        .progress-fill { width: 0%; background: #007bff; height: 100%; transition: width 0.3s; }
-        video { width: 100%; margin-top: 20px; border-radius: 10px; display: none; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Sitelive Universe</h2>
-        <p id="status">Checking WebGPU...</p>
-        
-        <input type="text" id="prompt" placeholder="Describe your video (e.g. A futuristic clinic)">
-        <button id="gen-btn" disabled>Create Video</button>
+<script type="module">
+    import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
 
-        <div id="progress-container">
-            <p id="progress-text">Downloading Engine: 0%</p>
-            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
-        </div>
+    const btn = document.getElementById('gen-btn');
+    const status = document.getElementById('status');
+    const fill = document.getElementById('progress-fill');
+    const progText = document.getElementById('progress-text');
+    const progCont = document.getElementById('progress-container');
+    const video = document.getElementById('output-video');
 
-        <video id="output-video" controls></video>
-    </div>
+    if (navigator.gpu) {
+        status.innerText = "✅ System Ready (LTX Engine)";
+        btn.disabled = false;
+    }
 
-    <script type="module">
-        import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
+    btn.onclick = async () => {
+        const userPrompt = document.getElementById('prompt').value || "Cinematic shot of a sunset";
+        btn.disabled = true;
+        progCont.style.display = 'block';
 
-        const btn = document.getElementById('gen-btn');
-        const status = document.getElementById('status');
-        const fill = document.getElementById('progress-fill');
-        const progText = document.getElementById('progress-text');
-        const progCont = document.getElementById('progress-container');
-        const video = document.getElementById('output-video');
-
-        if (navigator.gpu) {
-            status.innerText = "✅ System Ready";
-            btn.disabled = false;
-        } else {
-            status.innerText = "❌ WebGPU Not Supported";
-        }
-
-        btn.onclick = async () => {
-            const userPrompt = document.getElementById('prompt').value || "A cinematic landscape";
-            btn.disabled = true;
-            progCont.style.display = 'block';
-
-            // Start the pipeline with a progress callback
-            const generator = await pipeline('text-to-video', 'onnx-community/Wan2.1-1.3B-Instruct', {
-                device: 'webgpu',
-                dtype: 'q4',
-                progress_callback: (data) => {
-                    if (data.status === 'progress') {
-                        const p = Math.round(data.progress);
-                        fill.style.width = p + '%';
-                        progText.innerText = `Loading Engine: ${p}%`;
-                    }
+        // 🚀 SWITCHING TO LTX-VIDEO 2.3 (Quantized for WebGPU)
+        const generator = await pipeline('text-to-video', 'onnx-community/LTX-Video-0.1-q4', {
+            device: 'webgpu',
+            dtype: 'q4', // This is the compression that makes it fast!
+            progress_callback: (data) => {
+                if (data.status === 'progress') {
+                    const p = Math.round(data.progress);
+                    fill.style.width = p + '%';
+                    progText.innerText = `Compressing LTX Engine: ${p}%`;
                 }
-            });
+            }
+        });
 
-            progText.innerText = "Generating Video Pixels...";
-            const result = await generator(userPrompt);
-            
-            // Show the result
-            video.src = URL.createObjectURL(result.video);
-            video.style.display = 'block';
-            progCont.style.display = 'none';
-            btn.disabled = false;
-        };
-    </script>
-</body>
-</html>
+        progText.innerText = "LTX is dreaming up your video...";
+        const result = await generator(userPrompt, {
+            num_frames: 16, // Keeps it fast for mobile
+            width: 512,
+            height: 320
+        });
+        
+        video.src = URL.createObjectURL(result.video);
+        video.style.display = 'block';
+        progCont.style.display = 'none';
+        btn.disabled = false;
+    };
+</script>
