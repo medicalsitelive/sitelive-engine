@@ -8,32 +8,48 @@
     const progCont = document.getElementById('progress-container');
     const video = document.getElementById('output-video');
 
+    let currentDisplayProgress = 0;
+
+    // This function makes the number "race" smoothly
+    function updateDisplay(target) {
+        const step = () => {
+            if (currentDisplayProgress < target) {
+                currentDisplayProgress += 0.35; // The "Speed" of the counter
+                if (currentDisplayProgress > target) currentDisplayProgress = target;
+                
+                fill.style.width = currentDisplayProgress + '%';
+                progText.innerHTML = `Compressing LTX Engine: <span style="color:#007bff; font-weight:bold;">${currentDisplayProgress.toFixed(2)}%</span>`;
+                requestAnimationFrame(step);
+            }
+        };
+        requestAnimationFrame(step);
+    }
+
     if (navigator.gpu) {
-        status.innerText = "✅ System Ready (LTX Engine)";
+        status.innerText = "✅ LTX System Ready";
         btn.disabled = false;
     }
 
     btn.onclick = async () => {
-        const userPrompt = document.getElementById('prompt').value || "Cinematic shot of a sunset";
+        const userPrompt = document.getElementById('prompt').value || "Cinematic medical drone shot";
         btn.disabled = true;
         progCont.style.display = 'block';
+        currentDisplayProgress = 0;
 
-        // 🚀 SWITCHING TO LTX-VIDEO 2.3 (Quantized for WebGPU)
         const generator = await pipeline('text-to-video', 'onnx-community/LTX-Video-0.1-q4', {
             device: 'webgpu',
-            dtype: 'q4', // This is the compression that makes it fast!
+            dtype: 'q4', 
             progress_callback: (data) => {
                 if (data.status === 'progress') {
-                    const p = Math.round(data.progress);
-                    fill.style.width = p + '%';
-                    progText.innerText = `Compressing LTX Engine: ${p}%`;
+                    // We send the real progress to our "Fast Counter"
+                    updateDisplay(data.progress);
                 }
             }
         });
 
         progText.innerText = "LTX is dreaming up your video...";
         const result = await generator(userPrompt, {
-            num_frames: 16, // Keeps it fast for mobile
+            num_frames: 16,
             width: 512,
             height: 320
         });
