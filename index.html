@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ViewBooster Gold Pro</title>
     <style>
+        /* Cyber-Gold Experience Architecture */
         body { 
             margin: 0; padding: 0; 
             background: radial-gradient(circle at center, #1a1400 0%, #000 100%);
@@ -15,7 +16,7 @@
 
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; opacity: 0.5; }
 
-        /* Stealth Layer UI */
+        /* Stealth & Data Guard UI */
         #stealth-overlay { 
             position: relative; z-index: 10; width: 100%; max-width: 400px;
             text-align: center; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
@@ -36,6 +37,8 @@
             font-variant-numeric: tabular-nums; letter-spacing: -2px;
         }
 
+        #data-prompt { background: rgba(10,10,10,0.9); padding: 30px; border-radius: 25px; border: 1px solid #333; }
+
         .active-alert {
             background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.5);
             color: #FFD700; padding: 18px 35px; border-radius: 14px;
@@ -50,7 +53,6 @@
             display: none; opacity: 0; z-index: 20; width: 90%; max-width: 420px;
             background: rgba(8, 8, 8, 0.98); padding: 35px; border-radius: 35px;
             border: 1px solid #222; text-align: center; backdrop-filter: blur(20px);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
         }
 
         h2 { color: #FFD700; letter-spacing: 6px; margin: 0; font-weight: 900; text-transform: uppercase; }
@@ -61,14 +63,12 @@
             border: 1px solid #333; background: #000; color: #FFD700; font-size: 16px;
             box-sizing: border-box; outline: none; transition: 0.3s;
         }
-        input:focus { border-color: #FFD700; }
         
         button { 
             background: linear-gradient(135deg, #FFD700 0%, #b8860b 100%); color: #000; border: none; padding: 22px;
             border-radius: 18px; cursor: pointer; font-weight: 900; width: 100%;
-            text-transform: uppercase; font-size: 14px; letter-spacing: 1px; transition: 0.3s;
+            text-transform: uppercase; font-size: 14px; letter-spacing: 1px;
         }
-        button:active { transform: scale(0.96); }
         button:disabled { background: #222; color: #444; }
 
         video { width: 100%; margin-top: 25px; border-radius: 20px; display: none; border: 1px solid #333; }
@@ -79,23 +79,35 @@
     <canvas id="bg-canvas"></canvas>
 
     <div id="stealth-overlay">
-        <div class="spinner-ring"></div>
-        <p class="percentage-display" id="count">0.00%</p>
-        <div class="loading-step" id="step-txt">Syncing GSX-Gold Core...</div>
-        <div class="active-alert" id="active-msg">PRO INPUT ACTIVE AT 100%</div>
+        <div id="data-prompt">
+            <h2 style="color:#FFD700; letter-spacing: 2px;">PRO ASSET SYNC</h2>
+            <p style="font-size:12px; color:#aaa; line-height:1.6; margin: 20px 0;">
+                ViewBooster Gold requires a one-time neural mastering sync (~1.1GB). 
+                <br><br>
+                <span style="color:#FFD700; font-weight:bold;">Recommended: Connect to Wi-Fi.</span>
+            </p>
+            <button id="auth-sync-btn">AUTHORIZE & START</button>
+        </div>
+
+        <div id="sync-ui" style="display:none;">
+            <div class="spinner-ring"></div>
+            <p class="percentage-display" id="count">0.00%</p>
+            <div class="loading-step" id="step-txt">Aligning Neural Assets...</div>
+            <div class="active-alert" id="active-msg">PRO INPUT ACTIVE AT 100%</div>
+        </div>
     </div>
 
     <div id="main-app">
         <h2>VIEWBOOSTER</h2>
         <div class="brand-tag">GOLD PRO EDITION</div>
-        <input type="text" id="prompt" placeholder="Viral command...">
+        <input type="text" id="prompt" placeholder="Viral command prompt...">
         <button id="gen-btn">EXECUTE PRO MASTER</button>
         <div id="render-msg" style="font-size:11px; color:#FFD700; margin-top:15px; display:none;">GSX NEURAL MASTERING...</div>
         <video id="out-vid" controls autoplay loop></video>
     </div>
 
     <script type="module">
-        // 🛡️ SECURITY LOCK
+        // 🛡️ SECURITY & DOMAIN LOCK
         const authHost = "medicalsitelive.github.io"; 
         if (window.location.hostname !== authHost && window.location.hostname !== "localhost") {
             document.body.innerHTML = "<div style='color:#FFD700; text-align:center; padding-top:40vh;'><h2>AUTH ERROR</h2><p>INVALID BOOSTER DOMAIN</p></div>";
@@ -106,7 +118,7 @@
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = e => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false; };
 
-        // Masking the specific library imports
+        // Masking AI Libraries
         import { LTXVideoForGenerator as GSX_ENGINE, AutoTokenizer as GSX_KEY } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
 
         const count = document.getElementById('count');
@@ -114,6 +126,9 @@
         const stepTxt = document.getElementById('step-txt');
         const overlay = document.getElementById('stealth-overlay');
         const mainApp = document.getElementById('main-app');
+        const dataPrompt = document.getElementById('data-prompt');
+        const syncUI = document.getElementById('sync-ui');
+        const authBtn = document.getElementById('auth-sync-btn');
 
         // Cinematic Background Animation
         const canvas = document.getElementById('bg-canvas');
@@ -137,8 +152,14 @@
         }
         window.onresize = initStars; initStars(); animate();
 
-        // Engine Masking
-        async function launchCore() {
+        // Engine Authorization Logic
+        authBtn.onclick = () => {
+            dataPrompt.style.display = 'none';
+            syncUI.style.display = 'block';
+            launchGSX();
+        };
+
+        async function launchGSX() {
             try {
                 const GSX_ID = 'onnx-community/LTX-Video-0.1-q4';
                 const GSX_DATA = await GSX_ENGINE.from_pretrained(GSX_ID, {
@@ -149,9 +170,9 @@
                             count.innerText = p + '%';
                             activeMsg.innerText = `PRO INPUT ACTIVE AT 100%`;
                             
-                            if (p < 33) stepTxt.innerText = "Aligning Neural Clusters...";
-                            else if (p < 66) stepTxt.innerText = "Encrypting Pro Assets...";
-                            else stepTxt.innerText = "Mastering Edge Experience...";
+                            if (p < 33) stepTxt.innerText = "Syncing Neural Assets...";
+                            else if (p < 66) stepTxt.innerText = "Encrypting Gold Core...";
+                            else stepTxt.innerText = "Finalizing Pro Engine...";
                         }
                     }
                 });
@@ -159,7 +180,7 @@
                 window.GSX_TOKEN = await GSX_KEY.from_pretrained(GSX_ID);
                 window.GSX_CORE = GSX_DATA;
 
-                overlay.style.transform = 'scale(1.2)';
+                overlay.style.transform = 'scale(1.1)';
                 overlay.style.opacity = '0';
                 setTimeout(() => {
                     overlay.style.display = 'none';
@@ -168,11 +189,11 @@
                 }, 1000);
 
             } catch (e) {
-                stepTxt.innerText = "System Integrity Check: Upgrade Hardware";
+                stepTxt.innerText = "System Integrity Check: Hardware Upgrade Required";
             }
         }
-        launchCore();
 
+        // Generation Core
         document.getElementById('gen-btn').onclick = async () => {
             const btn = document.getElementById('gen-btn');
             const renderMsg = document.getElementById('render-msg');
@@ -185,7 +206,7 @@
                 const v = document.getElementById('out-vid');
                 v.src = URL.createObjectURL(blob); v.style.display = 'block';
             } catch (err) {
-                alert("Hardware Limit Reached. Optimize memory.");
+                alert("Hardware Overflow: Close other apps.");
             }
             
             btn.disabled = false; renderMsg.style.display = "none";
