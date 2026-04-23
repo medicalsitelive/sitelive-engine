@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sitelive Universe | WebGPU Engine</title>
+    <style>body { font-family: sans-serif; text-align: center; padding: 50px; background: #111; color: white; }</style>
+</head>
+<body>
+    <h1>Boostara Innovations</h1>
+    <p>WebGPU Status: <span id="status">Checking...</span></p>
+    <button id="gen-btn" style="padding: 15px 30px; font-size: 18px; display: none;">Generate Video</button>
+
+    <script type="module">
+        // Import Transformers.js v3 from CDN
+        import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
+
+        const statusEl = document.getElementById('status');
+        const btn = document.getElementById('gen-btn');
+
+        // Check if user's phone supports WebGPU
+        if (navigator.gpu) {
+            statusEl.innerText = "✅ Ready (WebGPU Active)";
+            statusEl.style.color = "lime";
+            btn.style.display = "inline-block";
+        } else {
+            statusEl.innerText = "❌ Not Supported (Browser too old)";
+            statusEl.style.color = "red";
+        }
+
+        btn.onclick = async () => {
+            statusEl.innerText = "🌀 Loading 4-bit Engine... (One-time download)";
+            // This runs the engine entirely on the user's phone
+            const pipe = await pipeline('text-to-video', 'onnx-community/Wan2.1-1.3B-Instruct', {
+                device: 'webgpu',
+                dtype: 'q4' // Shrinks size for mobile users
+            });
+            statusEl.innerText = "🚀 Engine Ready. Generating...";
+            const output = await pipe("A futuristic city in Nairobi");
+            console.log(output);
+        };
+    </script>
+</body>
+</html>
+
