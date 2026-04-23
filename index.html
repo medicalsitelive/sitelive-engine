@@ -1,62 +1,129 @@
-<script type="module">
-    import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitelive Universe | LTX AI</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #e0e0e0; text-align: center; padding: 20px; }
+        .container { max-width: 450px; margin: 40px auto; background: #161616; padding: 30px; border-radius: 20px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+        h2 { color: #fff; letter-spacing: 1px; margin-bottom: 5px; }
+        .brand { font-size: 12px; color: #007bff; font-weight: bold; text-transform: uppercase; margin-bottom: 25px; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 10px; border: 1px solid #333; background: #222; color: white; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #444; color: #888; }
+        #progress-container { margin-top: 25px; display: none; text-align: left; }
+        .progress-bar { width: 100%; background: #222; height: 8px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { width: 0%; background: linear-gradient(90deg, #007bff, #00c6ff); height: 100%; transition: width 0.2s; }
+        .stats { display: flex; justify-content: space-between; font-size: 13px; color: #aaa; }
+        video { width: 100%; margin-top: 20px; border-radius: 12px; display: none; border: 1px solid #444; }
+        #status { font-size: 14px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sitelive Universe</h2>
+        <div class="brand">Powered by Boostara Innovations</div>
+        <p id="status">Checking WebGPU Hardware...</p>
+        
+        <input type="text" id="prompt" placeholder="Describe the video you want...">
+        <button id="gen-btn" disabled>Initialize LTX Engine</button>
 
-    const btn = document.getElementById('gen-btn');
-    const status = document.getElementById('status');
-    const fill = document.getElementById('progress-fill');
-    const progText = document.getElementById('progress-text');
-    const progCont = document.getElementById('progress-container');
-    const video = document.getElementById('output-video');
+        <div id="progress-container">
+            <div class="stats">
+                <span id="progress-text">Compressing: 0.00%</span>
+                <span id="time-left">Estimating time...</span>
+            </div>
+            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+            <div id="speed-text" style="font-size: 11px; color: #666; margin-top: 5px;">Analyzing connection speed...</div>
+        </div>
 
-    let currentDisplayProgress = 0;
+        <video id="output-video" controls autoplay loop></video>
+    </div>
 
-    // This function makes the number "race" smoothly
-    function updateDisplay(target) {
-        const step = () => {
-            if (currentDisplayProgress < target) {
-                currentDisplayProgress += 0.35; // The "Speed" of the counter
-                if (currentDisplayProgress > target) currentDisplayProgress = target;
+    <script type="module">
+        import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0";
+
+        const btn = document.getElementById('gen-btn');
+        const status = document.getElementById('status');
+        const fill = document.getElementById('progress-fill');
+        const progText = document.getElementById('progress-text');
+        const timeText = document.getElementById('time-left');
+        const speedText = document.getElementById('speed-text');
+        const progCont = document.getElementById('progress-container');
+        const video = document.getElementById('output-video');
+
+        let startTime;
+        let lastProgress = 0;
+
+        if (navigator.gpu) {
+            status.innerHTML = "<span style='color: #28a745;'>●</span> LTX System Ready";
+            btn.disabled = false;
+        } else {
+            status.innerHTML = "<span style='color: #dc3545;'>●</span> WebGPU Not Supported";
+        }
+
+        btn.onclick = async () => {
+            const userPrompt = document.getElementById('prompt').value || "Cinematic landscape, 4k";
+            btn.disabled = true;
+            progCont.style.display = 'block';
+            startTime = Date.now();
+
+            try {
+                const generator = await pipeline('text-to-video', 'onnx-community/LTX-Video-0.1-q4', {
+                    device: 'webgpu',
+                    dtype: 'q4',
+                    progress_callback: (data) => {
+                        if (data.status === 'progress') {
+                            const p = data.progress;
+                            fill.style.width = p.toFixed(2) + '%';
+                            progText.innerText = `Compressing: ${p.toFixed(2)}%`;
+
+                            // --- TIME CALCULATION LOGIC ---
+                            const currentTime = Date.now();
+                            const elapsedSeconds = (currentTime - startTime) / 1000;
+                            
+                            if (p > 0) {
+                                const estimatedTotalSeconds = (elapsedSeconds / p) * 100;
+                                const remainingSeconds = estimatedTotalSeconds - elapsedSeconds;
+                                
+                                const mins = Math.floor(remainingSeconds / 60);
+                                const secs = Math.floor(remainingSeconds % 60);
+                                
+                                if (mins > 0) {
+                                    timeText.innerText = `${mins}m ${secs}s remaining`;
+                                } else {
+                                    timeText.innerText = `${secs}s remaining`;
+                                }
+                                
+                                speedText.innerText = `Optimizing LTX weights for your hardware...`;
+                            }
+                        }
+                    }
+                });
+
+                timeText.innerText = "Finalizing...";
+                progText.innerText = "Generating Video...";
                 
-                fill.style.width = currentDisplayProgress + '%';
-                progText.innerHTML = `Compressing LTX Engine: <span style="color:#007bff; font-weight:bold;">${currentDisplayProgress.toFixed(2)}%</span>`;
-                requestAnimationFrame(step);
+                const result = await generator(userPrompt, {
+                    num_frames: 16,
+                    width: 512,
+                    height: 320
+                });
+                
+                video.src = URL.createObjectURL(result.video);
+                video.style.display = 'block';
+                progCont.style.display = 'none';
+                btn.disabled = false;
+                status.innerText = "✅ Generation Complete";
+                
+            } catch (err) {
+                console.error(err);
+                status.innerText = "❌ Error: " + err.message;
+                btn.disabled = false;
             }
         };
-        requestAnimationFrame(step);
-    }
-
-    if (navigator.gpu) {
-        status.innerText = "✅ LTX System Ready";
-        btn.disabled = false;
-    }
-
-    btn.onclick = async () => {
-        const userPrompt = document.getElementById('prompt').value || "Cinematic medical drone shot";
-        btn.disabled = true;
-        progCont.style.display = 'block';
-        currentDisplayProgress = 0;
-
-        const generator = await pipeline('text-to-video', 'onnx-community/LTX-Video-0.1-q4', {
-            device: 'webgpu',
-            dtype: 'q4', 
-            progress_callback: (data) => {
-                if (data.status === 'progress') {
-                    // We send the real progress to our "Fast Counter"
-                    updateDisplay(data.progress);
-                }
-            }
-        });
-
-        progText.innerText = "LTX is dreaming up your video...";
-        const result = await generator(userPrompt, {
-            num_frames: 16,
-            width: 512,
-            height: 320
-        });
-        
-        video.src = URL.createObjectURL(result.video);
-        video.style.display = 'block';
-        progCont.style.display = 'none';
-        btn.disabled = false;
-    };
-</script>
+    </script>
+</body>
+</html>
