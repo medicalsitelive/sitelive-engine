@@ -3,51 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViewBooster Gold | LTX Engine</title>
+    <title>ViewBooster Gold Pro</title>
     <style>
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #050505; color: #f0f0f0; text-align: center; padding: 20px; margin: 0; }
-        .container { max-width: 450px; margin: 30px auto; background: #111; padding: 30px; border-radius: 28px; border: 1px solid #222; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
-        h2 { color: #FFD700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; font-weight: 900; }
-        .brand { font-size: 10px; color: #666; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 25px; }
-        input { width: 100%; padding: 16px; margin: 15px 0; border-radius: 14px; border: 1px solid #333; background: #181818; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
-        input:focus { border-color: #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
-        button { background: linear-gradient(145deg, #FFD700, #d4af37); color: black; border: none; padding: 18px; border-radius: 14px; cursor: pointer; font-weight: 800; width: 100%; text-transform: uppercase; font-size: 14px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        button:active { transform: scale(0.97); }
-        button:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; }
-        #progress-container { margin-top: 30px; display: none; text-align: left; }
-        .progress-bar { width: 100%; background: #222; height: 8px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
-        .progress-fill { width: 0%; background: #FFD700; height: 100%; transition: width 0.15s ease-out; }
-        .stats { display: flex; justify-content: space-between; font-size: 12px; color: #FFD700; font-family: 'Courier New', monospace; }
-        video { width: 100%; margin-top: 25px; border-radius: 20px; display: none; border: 2px solid #222; }
-        #status-box { background: #181818; padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 20px; border: 1px solid #222; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 420px; background: #0a0a0a; padding: 40px 25px; border-radius: 32px; border: 1px solid #1a1a1a; box-shadow: 0 25px 60px rgba(0,0,0,0.9); position: relative; overflow: hidden; }
+        .pro-badge { position: absolute; top: 20px; right: 20px; background: #FFD700; color: #000; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 50px; text-transform: uppercase; }
+        h2 { color: #FFD700; text-transform: uppercase; letter-spacing: 4px; margin: 0; font-size: 20px; font-weight: 900; }
+        .brand { font-size: 9px; color: #444; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 35px; margin-top: 5px; }
+        input { width: 100%; padding: 18px; margin: 20px 0; border-radius: 16px; border: 1px solid #222; background: #111; color: white; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #FFD700; background: #151515; }
+        button { background: linear-gradient(135deg, #FFD700 0%, #b8860b 100%); color: #000; border: none; padding: 20px; border-radius: 16px; cursor: pointer; font-weight: 900; width: 100%; text-transform: uppercase; font-size: 14px; box-shadow: 0 10px 20px rgba(184, 134, 11, 0.2); transition: 0.3s; }
+        button:disabled { background: #1a1a1a; color: #333; cursor: not-allowed; box-shadow: none; }
+        #status-box { font-size: 11px; margin-bottom: 20px; font-family: monospace; color: #555; }
+        #progress-container { margin-top: 35px; display: none; text-align: left; }
+        .progress-bar { width: 100%; background: #111; height: 4px; border-radius: 10px; overflow: hidden; margin: 15px 0; border: 1px solid #1a1a1a; }
+        .progress-fill { width: 0%; background: #FFD700; height: 100%; transition: width 0.1s linear; }
+        .stats { display: flex; justify-content: space-between; font-size: 11px; color: #FFD700; font-family: monospace; font-weight: bold; }
+        video { width: 100%; margin-top: 30px; border-radius: 20px; display: none; border: 1px solid #222; }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="pro-badge">PRO</div>
         <h2>VIEWBOOSTER GOLD</h2>
         <div class="brand">BOOSTARA INNOVATIONS</div>
         
-        <div id="status-box">
-            Status: <span id="status-text" style="color: #888;">Initializing...</span>
-        </div>
+        <div id="status-box">SYSTEM: <span id="status-text">INITIALIZING...</span></div>
         
-        <input type="text" id="prompt" placeholder="Describe your viral video idea...">
-        <button id="gen-btn" disabled>Waiting for Hardware...</button>
+        <input type="text" id="prompt" placeholder="Describe your viral video concept...">
+        <button id="gen-btn" disabled>VERIFYING ENGINE</button>
 
         <div id="progress-container">
             <div class="stats">
                 <span id="p-percent">COMPRESSING: 0.00%</span>
-                <span id="p-time">--:--</span>
+                <span id="p-time">ESTIMATING...</span>
             </div>
             <div class="progress-bar"><div id="p-fill" class="progress-fill"></div></div>
-            <div style="font-size: 10px; color: #555; text-align: center;">Running LTX-Video 2.3 Edge Engine</div>
+            <div id="p-sub" style="font-size: 10px; color: #333; text-align: center; margin-top: 10px;">LTX-Video 2.3 | Hardware Accelerated</div>
         </div>
 
         <video id="output-video" controls autoplay loop></video>
     </div>
 
     <script type="module">
-        // Using the most stable v3 production link
         import { LTXVideoForGenerator, AutoTokenizer } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1";
 
         const btn = document.getElementById('gen-btn');
@@ -58,23 +56,22 @@
         const progCont = document.getElementById('progress-container');
         const video = document.getElementById('output-video');
 
-        // Check WebGPU immediately
-        async function checkHardware() {
+        async function initPro() {
             if (navigator.gpu) {
-                statusText.innerHTML = "✅ WebGPU Ready";
+                statusText.innerHTML = "WEBGPU OPTIMIZED";
                 statusText.style.color = "#FFD700";
                 btn.disabled = false;
-                btn.innerText = "INITIALIZE LTX 2.3";
+                btn.innerText = "GENERATE PRO VIDEO";
             } else {
-                statusText.innerHTML = "❌ Hardware Not Supported";
+                statusText.innerText = "HARDWARE INCOMPATIBLE";
                 statusText.style.color = "#ff4444";
-                btn.innerText = "INCOMPATIBLE DEVICE";
+                btn.innerText = "UPGRADE BROWSER";
             }
         }
-        checkHardware();
+        initPro();
 
         btn.onclick = async () => {
-            const userPrompt = document.getElementById('prompt').value || "A golden galaxy spinning";
+            const userPrompt = document.getElementById('prompt').value || "Gold liquid explosion, cinematic";
             btn.disabled = true;
             progCont.style.display = 'block';
             const startTime = Date.now();
@@ -82,7 +79,6 @@
             try {
                 const model_id = 'onnx-community/LTX-Video-0.1-q4';
                 
-                // Using the dedicated LTX class to avoid "Unsupported Pipeline" error
                 const model = await LTXVideoForGenerator.from_pretrained(model_id, {
                     device: 'webgpu',
                     dtype: 'q4',
@@ -92,21 +88,21 @@
                             fill.style.width = p.toFixed(2) + '%';
                             pPercent.innerText = `COMPRESSING: ${p.toFixed(2)}%`;
                             
-                            // High-speed estimation
                             const elapsed = (Date.now() - startTime) / 1000;
                             const remaining = (elapsed / p * 100) - elapsed;
                             const s = Math.floor(remaining % 60);
                             const m = Math.floor(remaining / 60);
-                            if (p > 0.5) pTime.innerText = m > 0 ? `${m}m ${s}s left` : `${s}s left`;
+                            if (p > 0.5) pTime.innerText = m > 0 ? `${m}m ${s}s LEFT` : `${s}s LEFT`;
                         }
                     }
                 });
 
                 const tokenizer = await AutoTokenizer.from_pretrained(model_id);
-                pPercent.innerText = "RENDERING PIXELS...";
+                pPercent.innerText = "MASTERING VIDEO...";
                 
+                // LTX Pro Settings
                 const { video: videoBlob } = await model.generate(userPrompt, tokenizer, {
-                    num_frames: 16,
+                    num_frames: 24, // Increased for Pro smoothness
                     width: 512,
                     height: 320,
                 });
@@ -115,12 +111,11 @@
                 video.style.display = 'block';
                 progCont.style.display = 'none';
                 btn.disabled = false;
-                btn.innerText = "REGENERATE GOLD";
-                statusText.innerText = "✅ MASTERED SUCCESSFULLY";
+                btn.innerText = "CREATE NEW MASTER";
+                statusText.innerText = "PRO MASTER COMPLETED";
 
             } catch (err) {
-                console.error(err);
-                statusText.innerText = "ENGINE ERROR: REFRESH AND TRY AGAIN";
+                statusText.innerText = "PRO ENGINE ERROR";
                 statusText.style.color = "red";
                 btn.disabled = false;
             }
